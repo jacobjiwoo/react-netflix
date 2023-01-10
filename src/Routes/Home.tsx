@@ -40,13 +40,29 @@ const Banner = styled.div<{ bgPhoto: string }>`
 `;
 
 const BannerTitle = styled.h2`
-  font-size: 58px;
+  font-size: 60px;
+  font-weight: 600;
   margin-bottom: 20px;
 `;
 
 const BannerOverview = styled.p`
   font-size: 20px;
   width: 50%;
+  margin-bottom: 30px;
+`;
+
+const BannerButtons = styled.div`
+  button {
+    font-size: 20px;
+    border: none;
+    border-radius: 10px;
+    width: 130px;
+    height: 50px;
+    margin-right: 10px;
+    &:hover {
+      cursor: pointer;
+    }
+  }
 `;
 
 const Slider = styled.div`
@@ -153,7 +169,6 @@ const BigMovie = styled(motion.div)`
     background-color: ${(props) => props.theme.black.darker};
   }
 `;
-
 const BigCover = styled.div<{ bgPhoto: string }>`
   height: 400px;
   background-image: linear-gradient(rgba(0, 0, 0, 0), #181818),
@@ -161,7 +176,6 @@ const BigCover = styled.div<{ bgPhoto: string }>`
   background-size: cover;
   background-position: top center;
 `;
-
 const BigInfo = styled.div`
   display: flex;
   padding: 30px 50px;
@@ -170,7 +184,6 @@ const BigInfo = styled.div`
     padding-right: 30px;
   }
 `;
-
 const BigTitle = styled.h3`
   position: absolute;
   top: 200px;
@@ -183,13 +196,14 @@ const BigTitle = styled.h3`
     font-size: 20px;
   }
 `;
-const ReserveButton = styled(motion.button)`
+const ReserveButton = styled.button`
   position: absolute;
   top: 320px;
   left: 50px;
   width: 130px;
   height: 50px;
   border-radius: 10px;
+  border: none;
   font-size: 20px;
   background-color: white;
   &:hover {
@@ -202,7 +216,6 @@ const BigDetail = styled.div`
   margin-bottom: 30px;
   font-size: 20px;
 `;
-
 const BigOverview = styled.div`
   font-size: 15px;
   line-height: 1.5;
@@ -319,6 +332,10 @@ function Home() {
           <Banner bgPhoto={makeImagePath(data?.results[0].backdrop_path || "")}>
             <BannerTitle>{data?.results[0].title}</BannerTitle>
             <BannerOverview>{data?.results[0].overview}</BannerOverview>
+            <BannerButtons>
+              <button>예매하기</button>
+              <button onClick={() => onBoxClicked(data?.results[0].id || 0)}>상세 정보</button>
+            </BannerButtons>
           </Banner>
           <Slider>
             <SliderTitle>현재 상영작</SliderTitle>
