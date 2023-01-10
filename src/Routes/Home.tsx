@@ -146,11 +146,11 @@ const BigMovie = styled(motion.div)`
   }
   &::-webkit-scrollbar-thumb {
     height: 30%;
-    background-color: ${props=>props.theme.black.lighter};
+    background-color: ${(props) => props.theme.black.lighter};
     border-radius: 15px;
   }
   &::-webkit-scrollbar-track {
-    background-color: ${props => props.theme.black.darker};
+    background-color: ${(props) => props.theme.black.darker};
   }
 `;
 
@@ -198,8 +198,6 @@ const ReserveButton = styled(motion.button)`
   }
 `;
 const BigDetail = styled.div`
-  /* border-left: 3px solid white;
-  padding-left: 15px; */
   width: 400px;
   margin-bottom: 30px;
   font-size: 20px;
@@ -211,8 +209,6 @@ const BigOverview = styled.div`
   color: ${(props) => props.theme.white.lighter};
   word-break: keep-all;
   div {
-    /* border-left: 3px solid white;
-    padding-left: 15px; */
     font-size: 20px;
     font-weight: bold;
     margin-bottom: 15px;
@@ -221,9 +217,15 @@ const BigOverview = styled.div`
 const BigCredits = styled.div`
   margin-bottom: 20px;
   font-size: 15px;
+  span {
+    color: grey;
+  }
 `;
 const BigGenre = styled.div`
   font-size: 15px;
+  span {
+    color: grey;
+  }
 `;
 
 const rowVariants = {
@@ -443,13 +445,13 @@ function Home() {
                         </div>
                         <div>
                           <BigCredits>
-                            출연:{" "}
+                            <span>출연: </span>
                             {creditData?.cast
                               .slice(0, 3)
                               .map((cast) => `${cast.name}, `)}
                           </BigCredits>
                           <BigGenre>
-                            장르:{" "}
+                            <span>장르: </span>
                             {clickedMovie.genres.map(
                               (genre) => `${genre.name}, `
                             )}
