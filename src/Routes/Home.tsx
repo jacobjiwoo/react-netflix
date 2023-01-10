@@ -129,39 +129,34 @@ const Overlay = styled(motion.div)`
 `;
 
 const BigMovie = styled(motion.div)`
-  border: 1px solid blue;
   position: absolute;
-  width: 50vw;
+  width: 55vw;
   height: 85vh;
   left: 0;
   right: 0;
   margin: 0 auto;
   border-radius: 15px;
   overflow: hidden;
-  background-color: black;
+  background-color: ${(props) => props.theme.black.darker};
   overflow: scroll;
   overflow-x: hidden;
+  box-sizing: border-box;
   &::-webkit-scrollbar {
     width: 5px;
   }
   &::-webkit-scrollbar-thumb {
     height: 30%;
-    background-color: red;
+    background-color: ${props=>props.theme.black.lighter};
     border-radius: 15px;
   }
   &::-webkit-scrollbar-track {
-    background-color: black;
+    background-color: ${props => props.theme.black.darker};
   }
 `;
 
 const BigCover = styled.div<{ bgPhoto: string }>`
-  /* border: 1px solid blue; */
   height: 400px;
-  background-image: linear-gradient(
-      rgba(0, 0, 0, 0),
-      rgba(0, 0, 0, 0.3),
-      rgba(0, 0, 0, 1)
-    ),
+  background-image: linear-gradient(rgba(0, 0, 0, 0), #181818),
     url(${(props) => props.bgPhoto});
   background-size: cover;
   background-position: top center;
@@ -169,10 +164,10 @@ const BigCover = styled.div<{ bgPhoto: string }>`
 
 const BigInfo = styled.div`
   display: flex;
-  border: 1px solid white;
   padding: 30px 50px;
-  & > div {
-    border: 1px solid white;
+  & > div:first-child {
+    width: 800px;
+    padding-right: 30px;
   }
 `;
 
@@ -180,20 +175,21 @@ const BigTitle = styled.h3`
   position: absolute;
   top: 200px;
   left: 50px;
-  font-size: 50px;
+  font-size: 45px;
   color: ${(props) => props.theme.white.lighter};
   div {
     padding-top: 10px;
-    font-size: 25px;
+    padding-left: 5px;
+    font-size: 20px;
   }
 `;
 const ReserveButton = styled(motion.button)`
   position: absolute;
   top: 320px;
   left: 50px;
-  width: 100px;
+  width: 130px;
   height: 50px;
-  border-radius: 15px;
+  border-radius: 10px;
   font-size: 20px;
   background-color: white;
   &:hover {
@@ -202,24 +198,32 @@ const ReserveButton = styled(motion.button)`
   }
 `;
 const BigDetail = styled.div`
-  border-left: 3px solid white;
+  /* border-left: 3px solid white;
+  padding-left: 15px; */
   width: 400px;
   margin-bottom: 30px;
-  padding-left: 15px;
   font-size: 20px;
 `;
 
 const BigOverview = styled.div`
-  border-left: 3px solid white;
-  width: 350px;
-  padding-left: 15px;
   font-size: 15px;
   line-height: 1.5;
   color: ${(props) => props.theme.white.lighter};
+  word-break: keep-all;
+  div {
+    /* border-left: 3px solid white;
+    padding-left: 15px; */
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 15px;
+  }
 `;
-const BigCredits = styled.div``;
+const BigCredits = styled.div`
+  margin-bottom: 20px;
+  font-size: 15px;
+`;
 const BigGenre = styled.div`
-  border: 1px solid red;
+  font-size: 15px;
 `;
 
 const rowVariants = {
@@ -387,7 +391,7 @@ function Home() {
                   exit={{ opacity: 0 }}
                 />
                 <BigMovie
-                  style={{ top: scrollY.get() + 40 }}
+                  style={{ top: scrollY.get() + 50 }}
                   layoutId={bigMovieMatch.params.movieId}
                 >
                   {clickedMovie && (
@@ -404,18 +408,22 @@ function Home() {
                             navigate(`/movies/ticketing/${clickedMovie.id}`)
                           }
                         >
-                          예매
+                          예매하기
                         </ReserveButton>
                       </BigCover>
                       <BigInfo>
                         <div>
                           <BigDetail>
-                            {clickedMovie.release_date.split("-")[0]}
-                            {" • "}
-                            {`${Math.floor(clickedMovie.runtime / 60)}시간 ${
-                              clickedMovie.runtime % 60
-                            }분`}
-                            {" • "}
+                            <span>
+                              {clickedMovie.release_date.split("-")[0]}
+                            </span>
+                            &nbsp;&nbsp;•&nbsp;&nbsp;
+                            <span>
+                              {`${Math.floor(clickedMovie.runtime / 60)}시간 ${
+                                clickedMovie.runtime % 60
+                              }분`}
+                            </span>
+                            &nbsp;&nbsp;•&nbsp;&nbsp;
                             <span>
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
