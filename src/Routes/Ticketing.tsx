@@ -77,7 +77,7 @@ function Ticketing() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         />
-        <Wrapper style={{ top: scrollY.get() + 40 }} layoutId={movieId}>
+        <Wrapper style={{ top: scrollY.get() + 50 }} layoutId={movieId}>
           {/* <Setting
             initial={{ y: 200 }}
             animate={{ y: 0 }}

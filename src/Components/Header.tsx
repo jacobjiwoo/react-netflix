@@ -11,11 +11,12 @@ const Nav = styled(motion.nav)`
   align-items: center;
   width: 100%;
   top: 0;
-  background-color: black;
+  background: linear-gradient(#181818, rgba(0, 0, 0, 0));
   padding: 20px 60px;
   font-size: 14px;
   color: white;
   box-sizing: border-box;
+  z-index: 20;
 `;
 
 const Col = styled.div`
@@ -107,10 +108,10 @@ const logoVariants = {
 
 const navVariants = {
   top: {
-    backgroundColor: "rgba(0, 0, 0, 1)",
+    backgroundColor: "rgba(0, 0, 0, 0)",
   },
   scroll: {
-    backgroundColor: "rgba(0, 0, 0, 1)",
+    backgroundColor: "#181818",
   },
 };
 
@@ -119,12 +120,13 @@ interface IForm {
 }
 
 function Header() {
-  const [searchOpen, setSearchOpen] = useState(false);
+  const navigate = useNavigate();
   const homeMatch = useMatch("/");
   const tvMatch = useMatch("tv");
   const inputAnimation = useAnimation();
   const navAnimation = useAnimation();
   const { scrollY } = useScroll();
+  const [searchOpen, setSearchOpen] = useState(false);
   const toggleSearch = () => {
     if (searchOpen) {
       inputAnimation.start({
@@ -144,13 +146,12 @@ function Header() {
       }
     });
   });
-  const navigate = useNavigate();
   const { register, handleSubmit } = useForm<IForm>();
   const onValid = (data: IForm) => {
     navigate(`/Search?keyword=${data.keyword}`);
   };
   return (
-    <Nav variants={navVariants} initial="top" animate={navAnimation}>
+    <Nav variants={navVariants} animate={navAnimation}>
       <Col>
         <Logo to="/">
           <motion.svg
@@ -167,12 +168,13 @@ function Header() {
         </Logo>
         <Items>
           <Item>
-            <Link to="/">Home {homeMatch && <Circle layoutId="circle" />}</Link>
+            <Link to="/">홈 {homeMatch && <Circle layoutId="circle" />}</Link>
           </Item>
           <Item>
-            <Link to="tv">
-              Tv Shows {tvMatch && <Circle layoutId="circle" />}
-            </Link>
+            <Link to="/">영화</Link>
+          </Item>
+          <Item>
+            <Link to="tv">TV{tvMatch && <Circle layoutId="circle" />}</Link>
           </Item>
         </Items>
       </Col>
