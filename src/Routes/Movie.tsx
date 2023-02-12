@@ -1,17 +1,19 @@
 import { useState, useEffect } from "react";
-import { useQuery } from "react-query";
 import { useMatch, useNavigate } from "react-router-dom";
+import { useQuery } from "react-query";
 import styled from "styled-components";
 import {
-  getAiringTodayTv,
-  getOnTheAirTv,
-  getPopularTv,
-  getTopRatedTv,
-  IGetTvResult,
-} from "../api/TvApi";
-import TvSlider from "../Components/TvSlider";
+  getNowPlayingMovie,
+  getPopularMovie,
+  getTopRatedMovie,
+  getUpcomingMovie,
+  IGetMoviesResult,
+} from "../api/MovieApi";
 import { makeImagePath } from "../utils";
-import BigTv from "./BigTv";
+import { motion, AnimatePresence } from "framer-motion";
+import Ticketing from "./Ticketing";
+import BigMovie from "./BigMovie";
+import Slider from "../Components/MovieSlider";
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.black.darker};
@@ -27,7 +29,6 @@ const Banner = styled.div<{ bgphoto: string }>`
   padding: 0px 75px;
   background-image: linear-gradient(rgba(0, 0, 0, 0), #181818),
     url(${(props) => props.bgphoto});
-  background-color: #2f2f2f;
   background-size: cover;
 `;
 const BannerTitle = styled.h2`
@@ -67,27 +68,32 @@ const BannerButtons = styled.div`
   }
 `;
 
-function Tv() {
+function Movie() {
   const navigate = useNavigate();
-  const bigTvMatch = useMatch("tv/details/:tvId");
-  const { data: popularTvData, isLoading: popularTvLoading } =
-    useQuery<IGetTvResult>("popularTv", getPopularTv);
-  const { data: airingTodayTvData, isLoading: airingTodayTvLoading } =
-    useQuery<IGetTvResult>("airingTodayTv", getAiringTodayTv);
-  const { data: onTheAirTvData, isLoading: onTheAirTvLoading } =
-    useQuery<IGetTvResult>("onTheAirTv", getOnTheAirTv);
-  const { data: topRatedTvData, isLoading: topRatedTvLoading } =
-    useQuery<IGetTvResult>("topRatedTv", getTopRatedTv);
-  const onBannerClicked = (tvId: number) => {
-    navigate(`details/${tvId}`, { state: { layoutId: "banner" } });
+  const bigMovieMatch = useMatch("movie/details/:movieId");
+  //   const ticketingMatch = useMatch("/movies/ticketing/:movieId");
+  const { data: nowPlayingMovieData, isLoading: nowPlayingMovieLoading } =
+    useQuery<IGetMoviesResult>("nowPlaying", getNowPlayingMovie);
+  const { data: popularMovieData, isLoading: popularMovieLoading } =
+    useQuery<IGetMoviesResult>("popular", getPopularMovie);
+  const { data: topRatedMovieData, isLoading: topRatedMovieLoading } =
+    useQuery<IGetMoviesResult>("topRated", getTopRatedMovie);
+  const { data: upcomingMovieData, isLoading: upcomingMovieLoading } =
+    useQuery<IGetMoviesResult>("upComing", getUpcomingMovie);
+  const onBoxClicked = (movieId: number) => {
+    navigate(`details/${movieId}`, { state: { layoutId: "banner" } });
   };
   return (
     <Wrapper>
       <Banner
-        bgphoto={makeImagePath(popularTvData?.results[0].backdrop_path || "")}
+        bgphoto={makeImagePath(
+          nowPlayingMovieData?.results[0].backdrop_path || ""
+        )}
       >
-        <BannerTitle>{popularTvData?.results[0].name}</BannerTitle>
-        <BannerOverview>{popularTvData?.results[0].overview}</BannerOverview>
+        <BannerTitle>{nowPlayingMovieData?.results[0].title}</BannerTitle>
+        <BannerOverview>
+          {nowPlayingMovieData?.results[0].overview}
+        </BannerOverview>
         <BannerButtons>
           <button>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
@@ -96,7 +102,9 @@ function Tv() {
             <span>예매하기</span>
           </button>
           <button
-            onClick={() => onBannerClicked(popularTvData?.results[0].id || 0)}
+            onClick={() =>
+              onBoxClicked(nowPlayingMovieData?.results[0].id || 0)
+            }
           >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
               <path d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512zM216 336h24V272H216c-13.3 0-24-10.7-24-24s10.7-24 24-24h48c13.3 0 24 10.7 24 24v88h8c13.3 0 24 10.7 24 24s-10.7 24-24 24H216c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-144c-17.7 0-32-14.3-32-32s14.3-32 32-32s32 14.3 32 32s-14.3 32-32 32z" />
@@ -105,41 +113,42 @@ function Tv() {
           </button>
         </BannerButtons>
       </Banner>
-      {airingTodayTvData ? (
-        <TvSlider
-          key="airingTodayTv"
-          category={"오늘 방영한 프로그램"}
-          results={airingTodayTvData.results}
-          isLoading={airingTodayTvLoading}
+      {nowPlayingMovieData ? (
+        <Slider
+          key="nowPlayingMovie"
+          category={"현재 상영작"}
+          results={nowPlayingMovieData.results}
+          isLoading={nowPlayingMovieLoading}
         />
       ) : null}
-      {onTheAirTvData ? (
-        <TvSlider
-          key="onTheAirTv"
-          category={"현재 방영중인 프로그램"}
-          results={onTheAirTvData.results}
-          isLoading={onTheAirTvLoading}
+      {popularMovieData ? (
+        <Slider
+          key="popularMovie"
+          category={"인기 상영작"}
+          results={popularMovieData.results}
+          isLoading={popularMovieLoading}
         />
       ) : null}
-      {popularTvData ? (
-        <TvSlider
-          key="popularTv"
-          category={"인기 TV 프로그램"}
-          results={popularTvData.results}
-          isLoading={popularTvLoading}
+      {topRatedMovieData ? (
+        <Slider
+          key="topRatedMovie"
+          category={"최고 별점순"}
+          results={topRatedMovieData.results}
+          isLoading={topRatedMovieLoading}
         />
       ) : null}
-      {topRatedTvData ? (
-        <TvSlider
-          key="topRatedTv"
-          category={"최고 별점 프로그램"}
-          results={topRatedTvData.results}
-          isLoading={topRatedTvLoading}
+      {upcomingMovieData ? (
+        <Slider
+          key="upcomingMovie"
+          category={"개봉 예정작"}
+          results={upcomingMovieData.results}
+          isLoading={upcomingMovieLoading}
         />
       ) : null}
-      {bigTvMatch ? <BigTv /> : null}
+      {bigMovieMatch ? <BigMovie /> : null}
+      {/* {ticketingMatch ? <Ticketing /> : null} */}
     </Wrapper>
   );
 }
 
-export default Tv;
+export default Movie;

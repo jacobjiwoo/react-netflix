@@ -1,19 +1,20 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMatch, useNavigate } from "react-router-dom";
 import { useQuery } from "react-query";
 import styled from "styled-components";
 import {
-  getNowPlaying,
-  getPopularMovies,
-  getTopRated,
-  getUpcoming,
+  getNowPlayingMovie,
+  getPopularMovie,
+  getTopRatedMovie,
   IGetMoviesResult,
 } from "../api/MovieApi";
 import { makeImagePath } from "../utils";
 import { motion, AnimatePresence } from "framer-motion";
 import Ticketing from "./Ticketing";
 import BigMovie from "./BigMovie";
-import Slider from "../Components/Slider";
+import Slider from "../Components/MovieSlider";
+import { getPopularTv, getTopRatedTv, IGetTvResult } from "../api/TvApi";
+import TvSlider from "../Components/TvSlider";
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.black.darker};
@@ -72,24 +73,29 @@ function Home() {
   const navigate = useNavigate();
   const bigMovieMatch = useMatch("/movies/:movieId");
   const ticketingMatch = useMatch("/movies/ticketing/:movieId");
-  const { data: nowPlayingData, isLoading: nowPlayingLoading } =
-    useQuery<IGetMoviesResult>("nowPlaying", getNowPlaying);
-  const { data: popularData, isLoading: popularLoading } =
-    useQuery<IGetMoviesResult>("popular", getPopularMovies);
-  const { data: topRatedData, isLoading: topRatedLoading } =
-    useQuery<IGetMoviesResult>("topRated", getTopRated);
-  const { data: upcomingData, isLoading: upcomingLoading } =
-    useQuery<IGetMoviesResult>("upComing", getUpcoming);
+  const { data: topRatedMovieData, isLoading: topRatedMovieLoading } =
+    useQuery<IGetMoviesResult>("topRated", getTopRatedMovie);
+  const { data: topRatedTvData, isLoading: topRatedTvLoading } =
+    useQuery<IGetTvResult>("topRatedTv", getTopRatedTv);
+  const { data: popularMovieData, isLoading: popularMovieLoading } =
+    useQuery<IGetMoviesResult>("popular", getPopularMovie);
+  const { data: popularTvData, isLoading: popularTvLoading } =
+    useQuery<IGetTvResult>("popularTv", getPopularTv);
   const onBoxClicked = (movieId: number) => {
-    navigate(`/movies/${movieId}`, {state: {layoutId: "banner"}});
+    navigate(`/movies/${movieId}`, { state: { layoutId: "banner" } });
   };
+  useEffect(() => window.scroll({ top: 0 }));
   return (
     <Wrapper>
       <Banner
-        bgphoto={makeImagePath(nowPlayingData?.results[0].backdrop_path || "")}
+        bgphoto={makeImagePath(
+          topRatedMovieData?.results[0].backdrop_path || ""
+        )}
       >
-        <BannerTitle>{nowPlayingData?.results[0].title}</BannerTitle>
-        <BannerOverview>{nowPlayingData?.results[0].overview}</BannerOverview>
+        <BannerTitle>{topRatedMovieData?.results[0].title}</BannerTitle>
+        <BannerOverview>
+          {topRatedMovieData?.results[0].overview}
+        </BannerOverview>
         <BannerButtons>
           <button>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
@@ -98,7 +104,7 @@ function Home() {
             <span>예매하기</span>
           </button>
           <button
-            onClick={() => onBoxClicked(nowPlayingData?.results[0].id || 0)}
+            onClick={() => onBoxClicked(topRatedMovieData?.results[0].id || 0)}
           >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
               <path d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512zM216 336h24V272H216c-13.3 0-24-10.7-24-24s10.7-24 24-24h48c13.3 0 24 10.7 24 24v88h8c13.3 0 24 10.7 24 24s-10.7 24-24 24H216c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-144c-17.7 0-32-14.3-32-32s14.3-32 32-32s32 14.3 32 32s-14.3 32-32 32z" />
@@ -107,40 +113,39 @@ function Home() {
           </button>
         </BannerButtons>
       </Banner>
-      {nowPlayingData ? (
+      {topRatedMovieData ? (
         <Slider
           key="nowPlaying"
-          category={"현재 상영작"}
-          results={nowPlayingData.results}
-          isLoading={nowPlayingLoading}
+          category={"최고 별점 영화"}
+          results={topRatedMovieData.results}
+          isLoading={topRatedMovieLoading}
         />
       ) : null}
-      {popularData ? (
+      {topRatedTvData ? (
+        <TvSlider
+          key="topRatedTv"
+          category={"최고 별점 프로그램"}
+          results={topRatedTvData.results}
+          isLoading={topRatedTvLoading}
+        />
+      ) : null}
+      {popularMovieData ? (
         <Slider
-          key="popular"
+          key="popularMovie"
           category={"인기 상영작"}
-          results={popularData.results}
-          isLoading={popularLoading}
+          results={popularMovieData.results}
+          isLoading={popularMovieLoading}
         />
       ) : null}
-      {topRatedData ? (
-        <Slider
-          key="topRated"
-          category={"최고 별점순"}
-          results={topRatedData.results}
-          isLoading={topRatedLoading}
-        />
-      ) : null}
-      {upcomingData ? (
-        <Slider
-          key="upcoming"
-          category={"개봉 예정작"}
-          results={upcomingData.results}
-          isLoading={upcomingLoading}
+      {popularTvData ? (
+        <TvSlider
+          key="popularTv"
+          category={"인기 TV 프로그램"}
+          results={popularTvData.results}
+          isLoading={popularTvLoading}
         />
       ) : null}
       {bigMovieMatch ? <BigMovie /> : null}
-      {ticketingMatch ? <Ticketing /> : null}
     </Wrapper>
   );
 }

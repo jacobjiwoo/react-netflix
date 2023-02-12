@@ -9,11 +9,11 @@ import {
 } from "react-router-dom";
 import styled from "styled-components";
 import {
-  getMovieCredits,
-  getMovieDetails,
-  IGetMovieCredits,
-  IGetMovieDetails,
-} from "../api/MovieApi";
+  getTvCredits,
+  getTvDetails,
+  IGetTvCredits,
+  IGetTvDetails,
+} from "../api/TvApi";
 import { makeImagePath } from "../utils";
 
 const Overlay = styled(motion.div)`
@@ -60,14 +60,6 @@ const BigCover = styled.div<{ bgPhoto: string }>`
   background-size: cover;
   background-position: top center;
 `;
-const BigInfo = styled.div`
-  display: flex;
-  padding: 30px 50px;
-  & > div:first-child {
-    width: 800px;
-    padding-right: 30px;
-  }
-`;
 const BigTitle = styled.h3`
   position: absolute;
   top: 200px;
@@ -110,6 +102,14 @@ const ReserveButton = styled.button`
     margin-right: 10px;
   }
 `;
+const BigInfo = styled.div`
+  display: flex;
+  padding: 30px 50px;
+  & > div:first-child {
+    width: 800px;
+    padding-right: 30px;
+  }
+`;
 const BigDetail = styled.div`
   width: 400px;
   margin-bottom: 30px;
@@ -140,20 +140,20 @@ const BigGenre = styled.div`
   }
 `;
 
-function BigMovie() {
+function BigTv() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { movieId } = useParams();
+  const { tvId } = useParams();
   const { scrollY } = useScroll();
-  const { data: clickedMovie, isLoading: clickedLoading } =
-    useQuery<IGetMovieDetails>(["movieDetails", movieId], () =>
-      getMovieDetails(Number(movieId))
+  const { data: clickedTv, isLoading: clickedLoading } =
+    useQuery<IGetTvDetails>(["tvDetails", tvId], () =>
+      getTvDetails(Number(tvId))
     );
   const { data: creditData, isLoading: creditLoading } =
-    useQuery<IGetMovieCredits>(["credits", movieId], () =>
-      getMovieCredits(Number(movieId))
+    useQuery<IGetTvCredits>(["credits", tvId], () =>
+      getTvCredits(Number(tvId))
     );
-  const closeBigMovie = () => {
+  const closeBigTv = () => {
     document.body.style.overflow = "unset";
     navigate(-1);
   };
@@ -162,31 +162,31 @@ function BigMovie() {
   });
   return (
     <>
-      <Overlay onClick={closeBigMovie} />
+      <Overlay onClick={closeBigTv} />
       <AnimatePresence>
         {clickedLoading || creditLoading ? null : (
           <Wrapper
             style={{ top: scrollY.get() + 50 }}
-            // layoutId={location.state.layoutId}
+            // layoutId={tvId}
           >
-            {clickedMovie &&
+            {clickedTv &&
               creditData &&
               (clickedLoading || creditLoading ? (
                 "Loading..."
               ) : (
                 <>
                   <CloseButton
-                    onClick={closeBigMovie}
+                    onClick={closeBigTv}
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 512 512"
                     fill="white"
                   >
                     <path d="M175 175C184.4 165.7 199.6 165.7 208.1 175L255.1 222.1L303 175C312.4 165.7 327.6 165.7 336.1 175C346.3 184.4 346.3 199.6 336.1 208.1L289.9 255.1L336.1 303C346.3 312.4 346.3 327.6 336.1 336.1C327.6 346.3 312.4 346.3 303 336.1L255.1 289.9L208.1 336.1C199.6 346.3 184.4 346.3 175 336.1C165.7 327.6 165.7 312.4 175 303L222.1 255.1L175 208.1C165.7 199.6 165.7 184.4 175 175V175zM512 256C512 397.4 397.4 512 256 512C114.6 512 0 397.4 0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256zM256 48C141.1 48 48 141.1 48 256C48 370.9 141.1 464 256 464C370.9 464 464 370.9 464 256C464 141.1 370.9 48 256 48z" />
                   </CloseButton>
-                  <BigCover bgPhoto={makeImagePath(clickedMovie.backdrop_path)}>
+                  <BigCover bgPhoto={makeImagePath(clickedTv.backdrop_path)}>
                     <BigTitle>
-                      {clickedMovie.title}
-                      <div>{clickedMovie.original_title}</div>
+                      {clickedTv.name}
+                      <div>{clickedTv.original_name}</div>
                     </BigTitle>
                     <ReserveButton>
                       <svg
@@ -201,13 +201,9 @@ function BigMovie() {
                   <BigInfo>
                     <div>
                       <BigDetail>
-                        <span>{clickedMovie.release_date.split("-")[0]}</span>
+                        <span>{clickedTv.first_air_date.split("-")[0]}</span>
                         &nbsp;&nbsp;•&nbsp;&nbsp;
-                        <span>
-                          {`${Math.floor(clickedMovie.runtime / 60)}시간 ${
-                            clickedMovie.runtime % 60
-                          }분`}
-                        </span>
+                        <span>{`에피소드 ${clickedTv.number_of_episodes}개`}</span>
                         &nbsp;&nbsp;•&nbsp;&nbsp;
                         <span>
                           <svg
@@ -218,12 +214,12 @@ function BigMovie() {
                           >
                             <path d="M316.9 18C311.6 7 300.4 0 288.1 0s-23.4 7-28.8 18L195 150.3 51.4 171.5c-12 1.8-22 10.2-25.7 21.7s-.7 24.2 7.9 32.7L137.8 329 113.2 474.7c-2 12 3 24.2 12.9 31.3s23 8 33.8 2.3l128.3-68.5 128.3 68.5c10.8 5.7 23.9 4.9 33.8-2.3s14.9-19.3 12.9-31.3L438.5 329 542.7 225.9c8.6-8.5 11.7-21.2 7.9-32.7s-13.7-19.9-25.7-21.7L381.2 150.3 316.9 18z" />
                           </svg>{" "}
-                          {Math.round(clickedMovie.vote_average * 10) / 10}
+                          {Math.round(clickedTv.vote_average * 10) / 10}
                         </span>
                       </BigDetail>
                       <BigOverview>
-                        <div>{clickedMovie.tagline}</div>
-                        {clickedMovie.overview}
+                        <div>{clickedTv.tagline}</div>
+                        {clickedTv.overview}
                       </BigOverview>
                     </div>
                     <div>
@@ -235,7 +231,7 @@ function BigMovie() {
                       </BigCredits>
                       <BigGenre>
                         <span>장르: </span>
-                        {clickedMovie.genres
+                        {clickedTv.genres
                           .slice(0, 3)
                           .map((genre) => `${genre.name}, `)}
                       </BigGenre>
@@ -250,4 +246,4 @@ function BigMovie() {
   );
 }
 
-export default BigMovie;
+export default BigTv;

@@ -10,14 +10,7 @@ export interface IMovie {
 }
 
 export interface IGetMoviesResult {
-  dates: {
-    maximum: string;
-    minimum: string;
-  };
-  page: number;
   results: IMovie[];
-  total_pages: number;
-  totla_results: number;
 }
 
 export interface IGetMovieDetails {
@@ -33,7 +26,7 @@ export interface IGetMovieDetails {
   vote_average: number;
 }
 
-export interface IGetCredits {
+export interface IGetMovieCredits {
   id: number;
   cast: {
     name: string;
@@ -45,34 +38,34 @@ export function getMovieDetails(movieId: number) {
     `${BASE_PATH}/movie/${movieId}?api_key=${API_KEY}&language=ko-KR`
   ).then((resposne) => resposne.json());
 }
-export function getNowPlaying() {
+export function getNowPlayingMovie() {
   return fetch(
     `${BASE_PATH}/movie/now_playing?api_key=${API_KEY}&language=ko-KR`
   ).then((response) => response.json());
 }
-export function getPopularMovies() {
+export function getPopularMovie() {
   return fetch(
     `${BASE_PATH}/movie/popular?api_key=${API_KEY}&language=ko-KR`
   ).then((response) => response.json());
 }
-export function getTopRated() {
+export function getTopRatedMovie() {
   return fetch(
     `${BASE_PATH}/movie/top_rated?api_key=${API_KEY}&language=ko-KR`
   ).then((response) => response.json());
 }
-export function getUpcoming() {
+export function getUpcomingMovie() {
   return fetch(
     `${BASE_PATH}/movie/upcoming?api_key=${API_KEY}&language=ko-KR`
   ).then((response) => response.json());
 }
 
-export function getCredits(movieId: number) {
+export function getMovieCredits(movieId: number) {
   return fetch(
     `${BASE_PATH}/movie/${movieId}/credits?api_key=${API_KEY}&language=ko-KR`
   ).then((resposne) => resposne.json());
 }
 
-export function getSearchMovies(query: string) {
+export function getMovieSearch(query: string) {
   return fetch(`${BASE_PATH}/search/movie?api_key=${API_KEY}&language=ko-KR&query=${query}`
   ).then((resposne) => resposne.json());
 }
